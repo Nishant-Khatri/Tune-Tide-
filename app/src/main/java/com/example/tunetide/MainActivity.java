@@ -21,9 +21,11 @@ import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
-    ListView listView;
+    ListView listView,list2;
+    ArrayList<File> mySongs;
 
 
     @Override
@@ -36,14 +38,31 @@ public class MainActivity extends AppCompatActivity {
                 .withListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                      new Thread(new Runnable() {
+                          @Override
+                          public void run() {
+                            mySongs=new ArrayList<>();
+                              fetchSongs(Environment.getExternalStorageDirectory(),mySongs);
+                              runOnUiThread(new Runnable() {
+                                  @Override
+                                  public void run() {
+                                      String [] items=new String[mySongs.size()];
+                                      for(int i=0;i<mySongs.size();i++){
+                                          items[i]=mySongs.get(i).getName().replace(".mp3","");
+                                      }
+                                      ArrayAdapter<String> adapter= new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1,items );
+                                      listView.setAdapter(adapter);
 
-                        ArrayList<File> mySongs=fetchSongs(Environment.getExternalStorageDirectory());
-                        String [] items=new String[mySongs.size()];
-                        for(int i=0;i<mySongs.size();i++){
-                            items[i]=mySongs.get(i).getName().replace(".mp3","");
-                        }
-                        ArrayAdapter<String> adapter= new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1,items );
-                        listView.setAdapter(adapter);
+                                  }
+                              });
+                          }
+                      }).start();
+
+
+
+
+
+
                         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -69,21 +88,22 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .check();
     }
-        public ArrayList<File>  fetchSongs(File file){
-               ArrayList arrayList=new ArrayList();
+        public void fetchSongs(File file , ArrayList<File> song){
+
                File[] songs=file.listFiles();
                if(songs!=null) {
                 for(File myFile : songs){
                     if(!myFile.isHidden()&&myFile.isDirectory()){
-                        arrayList.addAll(fetchSongs(myFile));
+                      fetchSongs(myFile,song);
                     }
                     else{
-                        if(myFile.getName().endsWith("mp3")&&!myFile.getName().startsWith(".")){
-                            arrayList.add(myFile);
+                        if((myFile.getName().endsWith("mp3"))&&!myFile.getName().startsWith(".")){
+                            song.add(myFile);
                         }
                     }
                }
     }
-               return arrayList;
-    }
+
+
+        }
 }
