@@ -23,18 +23,19 @@
         android:id="@+id/textView2"
         android:layout_width="365dp"
         android:layout_height="70dp"
-        android:layout_marginTop="92dp"
+        android:layout_marginTop="76dp"
         android:ellipsize="marquee"
         android:fadingEdge="horizontal"
         android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
         android:singleLine="true"
         android:text="TextView"
+        android:textAlignment="center"
         android:textColor="#56D55B"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.652"
+        app:layout_constraintHorizontal_bias="0.326"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView5" />
 
@@ -53,22 +54,22 @@
 
     <ImageView
         android:id="@+id/play"
-        android:layout_width="92dp"
-        android:layout_height="73dp"
+        android:layout_width="82dp"
+        android:layout_height="67dp"
         android:layout_marginBottom="16dp"
         android:layout_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/next"
-        app:layout_constraintHorizontal_bias="0.294"
+        app:layout_constraintHorizontal_bias="0.465"
         app:layout_constraintStart_toEndOf="@+id/prev"
         app:layout_constraintTop_toTopOf="@+id/guideline4"
-        app:srcCompat="@drawable/pause"
-         />
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/pause" />
 
     <ImageView
         android:id="@+id/next"
-        android:layout_width="136dp"
-        android:layout_height="114dp"
+        android:layout_width="107dp"
+        android:layout_height="73dp"
         android:layout_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -77,8 +78,8 @@
 
     <ImageView
         android:id="@+id/prev"
-        android:layout_width="149dp"
-        android:layout_height="119dp"
+        android:layout_width="136dp"
+        android:layout_height="93dp"
         android:layout_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
