@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -16,7 +19,7 @@
         android:theme="@style/Theme.TuneTide"
         tools:targetApi="31">
         <activity
-            android:name=".SplashScreen"
+            android:name="com.example.activites.SplashScreen"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PlaySong"
+            android:name="com.example.activites.PlaySong"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
@@ -33,6 +36,9 @@
             android:exported="true">
 
         </activity>
+        <service
+            android:name="com.example.service.MusicService"
+            android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"
