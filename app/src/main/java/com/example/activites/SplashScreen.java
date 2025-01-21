@@ -1,4 +1,4 @@
-package com.example.tunetide;
+package com.example.activites;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,6 +9,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.tunetide.MainActivity;
+import com.example.tunetide.R;
 
 public class SplashScreen extends AppCompatActivity {
 TextView title;
@@ -22,7 +25,7 @@ ImageView img;
         Animation move= AnimationUtils.loadAnimation(this,R.anim.bounce);
         title.setAnimation(move);
 
-        Intent ihome=new Intent(SplashScreen.this,MainActivity.class);
+        Intent ihome=new Intent(SplashScreen.this, MainActivity.class);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
