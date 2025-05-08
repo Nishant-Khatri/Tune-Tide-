@@ -10,12 +10,10 @@ import android.content.ContentUris;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -37,7 +35,6 @@ import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     ListView listView;
@@ -101,6 +98,12 @@ public class MainActivity extends AppCompatActivity {
                         100);  // Request code for notification permission
             }
         }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_PHONE_STATE},
+                    102);  // Request code for phone state
+        }
         fabShuffle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -119,6 +122,13 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 // Permission denied
                 Toast.makeText(this, "Notification permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (requestCode == 102) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("MainActivity", "Phone state permission granted");
+            } else {
+                Toast.makeText(this, "Phone state permission denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
