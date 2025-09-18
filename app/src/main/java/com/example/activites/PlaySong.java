@@ -26,7 +26,6 @@ public class PlaySong extends AppCompatActivity {
     private TextView textView, duration;
     private ImageView play, prev, next;
     private SeekBar seekBar;
-
     private ArrayList<Song> songsList;
     private int position;
 
@@ -81,10 +80,12 @@ public class PlaySong extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
     }
 
@@ -98,52 +99,42 @@ public class PlaySong extends AppCompatActivity {
     }
 
     private void togglePlayPause() {
-
-            if (musicService.isPlaying()) {
-                musicService.pause();
-                play.setImageResource(R.drawable.play);
-            } else {
-                musicService.play();
-                play.setImageResource(R.drawable.pause);
-            }
-
+        if (musicService.isPlaying()) {
+            musicService.pause();
+            play.setImageResource(R.drawable.play);
+        } else {
+            musicService.play();
+            play.setImageResource(R.drawable.pause);
+        }
     }
 
     private void playNextSong() {
-
-            musicService.playNextSong();
-            updateSongInfo();
+        musicService.playNextSong();
+        updateSongInfo();
         seekBar.setProgress(0);
         updateSeekBar();
-
     }
 
     private void playPreviousSong() {
-
-            musicService.playPreviousSong();
-            updateSongInfo();
+        musicService.playPreviousSong();
+        updateSongInfo();
         seekBar.setProgress(0);
         updateSeekBar();
-
     }
 
     private void updateSongInfo() {
-
-            position = musicService.getCurrentSongPosition();
-            Song currentSong = songsList.get(position);
-            textView.setText(currentSong.getTitle());
-            textView.setSelected(true);
-            duration.setText(milliSecondsToTimer(musicService.getDuration()));
-            seekBar.setMax(musicService.getDuration());
-
+        position = musicService.getCurrentSongPosition();
+        Song currentSong = songsList.get(position);
+        textView.setText(currentSong.getTitle());
+        textView.setSelected(true);
+        duration.setText(milliSecondsToTimer(musicService.getDuration()));
+        seekBar.setMax(musicService.getDuration());
     }
 
     private void updateSeekBar() {
-
-            seekBar.setProgress(musicService.getCurrentPosition());
-            duration.setText(milliSecondsToTimer(musicService.getDuration() - musicService.getCurrentPosition()));
-            handler.postDelayed(this::updateSeekBar, 200);
-
+        seekBar.setProgress(musicService.getCurrentPosition());
+        duration.setText(milliSecondsToTimer(musicService.getDuration() - musicService.getCurrentPosition()));
+        handler.postDelayed(this::updateSeekBar, 200);
     }
 
     private String milliSecondsToTimer(long milliSeconds) {
@@ -157,7 +148,6 @@ public class PlaySong extends AppCompatActivity {
     private final BroadcastReceiver songCompletionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // When a song is completed, update the song info and SeekBar
             updateSongInfo();
             seekBar.setProgress(0);
             updateSeekBar();
@@ -168,6 +158,12 @@ public class PlaySong extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         registerReceiver(songCompletionReceiver, new IntentFilter("com.example.tunetide.SONG_COMPLETED"));
+        if (isBound && musicService != null) {
+            // Sync the UI with the current song
+            position = musicService.getCurrentSongPosition();
+            updateSongInfo();
+            updateSeekBar();
+        }
     }
 
     @Override
@@ -177,11 +173,19 @@ public class PlaySong extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (isBound) {
+            musicService.pause(); // Pause the music
+            isBound = false;
+        }
+        finish();
+    }
+    @Override
     protected void onDestroy() {
         super.onDestroy();
             unbindService(serviceConnection);
             isBound = false;
-
         handler.removeCallbacksAndMessages(null);
     }
 }

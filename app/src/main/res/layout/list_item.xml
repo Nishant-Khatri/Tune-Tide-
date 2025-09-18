@@ -19,7 +19,7 @@
         android:layout_height="45dp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="@android:color/black"
+        android:textColor="@color/primaryTextColor"
         android:textSize="18sp" />
 
 
