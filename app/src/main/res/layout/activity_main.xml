@@ -20,8 +20,8 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_shuffle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="64dp"
+        android:layout_height="66dp"
         android:layout_margin="16dp"
         android:clickable="true"
         app:backgroundTint="@android:color/transparent"
@@ -29,6 +29,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/shuffle"
-        app:tint="@color/purple_500" />
+        app:tint="@color/primaryFloatingButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

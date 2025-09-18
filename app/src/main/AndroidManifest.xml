@@ -3,8 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <application
+        android:name=".TuneTideApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,8 +20,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TuneTide"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/notification_icon" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notificationIconColor" />
+
         <activity
-            android:name=".SplashScreen"
+            android:name="com.example.activites.SplashScreen"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +37,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PlaySong"
+            android:name="com.example.activites.PlaySong"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
@@ -33,10 +45,14 @@
             android:exported="true">
 
         </activity>
+        <service
+            android:name="com.example.service.MusicService"
+            android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+        <receiver android:name=".receiver.NotificationActionReceiver" />
     </application>
 
 </manifest>

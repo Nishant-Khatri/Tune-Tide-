@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#DFFAD0"
-    tools:context=".SplashScreen">
+    tools:context="com.example.activites.SplashScreen">
 
     <ImageView
         android:id="@+id/poster"
