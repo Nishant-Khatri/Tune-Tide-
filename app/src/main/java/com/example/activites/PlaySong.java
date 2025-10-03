@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.example.models.Enums.SongPlaybackActionEnum;
 import com.example.models.Song;
 import com.example.service.MusicService;
 import com.example.tunetide.R;
@@ -34,6 +35,7 @@ public class PlaySong extends AppCompatActivity {
 
     private final Handler handler = new Handler();
 
+
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -52,6 +54,19 @@ public class PlaySong extends AppCompatActivity {
             isBound = false;
         }
     };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerReceiver(songCompletionReceiver, new IntentFilter("com.example.tunetide.SONG_COMPLETED"));
+        registerReceiver(playbackStateReceiver, new IntentFilter("com.example.tunetide.PLAYBACK_STATE_CHANGED"));
+        if (isBound && musicService != null) {
+            // Sync the UI with the current song
+            position = musicService.getCurrentSongPosition();
+            updateSongInfo();
+            updateSeekBar();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +115,7 @@ public class PlaySong extends AppCompatActivity {
 
     private void togglePlayPause() {
         if (musicService.isPlaying()) {
-            musicService.pause();
+            musicService.pause(true);
             play.setImageResource(R.drawable.play);
         } else {
             musicService.play();
@@ -145,6 +160,26 @@ public class PlaySong extends AppCompatActivity {
         return (hours > 0 ? hours + ":" : "") + String.format("%02d:%02d", minutes, seconds);
     }
 
+    private final BroadcastReceiver playbackStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch ((SongPlaybackActionEnum) intent.getSerializableExtra("playbackAction")){
+                case PLAY :
+                    play.setImageResource(R.drawable.pause);
+                    break;
+                case PAUSE:
+                    play.setImageResource(R.drawable.play);
+                    break;
+
+                case NEXT:
+                case PREV:
+                    updateSongInfo();
+                    break;
+
+            }
+        }
+    };
+
     private final BroadcastReceiver songCompletionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -153,18 +188,6 @@ public class PlaySong extends AppCompatActivity {
             updateSeekBar();
         }
     };
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        registerReceiver(songCompletionReceiver, new IntentFilter("com.example.tunetide.SONG_COMPLETED"));
-        if (isBound && musicService != null) {
-            // Sync the UI with the current song
-            position = musicService.getCurrentSongPosition();
-            updateSongInfo();
-            updateSeekBar();
-        }
-    }
 
     @Override
     protected void onStop() {
@@ -176,7 +199,7 @@ public class PlaySong extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         if (isBound) {
-            musicService.pause(); // Pause the music
+            musicService.pause(true); // Pause the music
             isBound = false;
         }
         finish();

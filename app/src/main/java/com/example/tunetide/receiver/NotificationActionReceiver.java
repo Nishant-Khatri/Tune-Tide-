@@ -24,7 +24,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 break;
             case Constants.ACTION_PLAY_PAUSE:
                 if (service.isPlaying()) {
-                    service.pause();
+                    service.pause(true);
                 } else {
                     service.play();
                 }
