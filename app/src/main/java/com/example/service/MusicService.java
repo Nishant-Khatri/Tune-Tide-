@@ -22,6 +22,7 @@ import android.telephony.TelephonyManager;
 import androidx.core.app.NotificationCompat;
 
 import com.example.models.Constants;
+import com.example.models.Enums.SongPlaybackActionEnum;
 import com.example.models.Song;
 import com.example.tunetide.R;
 import com.example.tunetide.TuneTideApp;
@@ -43,7 +44,7 @@ public class MusicService extends Service {
 
     private TelephonyManager telephonyManager;
     private PhoneStateListener phoneStateListener;
-    private boolean wasPlayingBeforeCall = false;
+    private boolean isPausedByUser;
 
 
     public class LocalBinder extends Binder {
@@ -84,13 +85,11 @@ public class MusicService extends Service {
                     case TelephonyManager.CALL_STATE_RINGING:
                     case TelephonyManager.CALL_STATE_OFFHOOK:
                         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                            wasPlayingBeforeCall = true;
-                            pause();
+                            pause(false);
                         }
                         break;
                     case TelephonyManager.CALL_STATE_IDLE:
-                        if (wasPlayingBeforeCall) {
-                            wasPlayingBeforeCall = false;
+                        if (!isPausedByUser) {
                             play();
                         }
                         break;
@@ -107,10 +106,16 @@ public class MusicService extends Service {
 
     }
 
+    private void sendPlaybackStateChangedIntent(SongPlaybackActionEnum songPlaybackActionEnum){
+        Intent intent = new Intent("com.example.tunetide.PLAYBACK_STATE_CHANGED");
+        intent.putExtra("playbackAction", songPlaybackActionEnum);
+        sendBroadcast(intent);
+    }
+
     private void handleNotificationForNewerVersions() {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel channel = new NotificationChannel(Constants.CHANNEL_ID,
-                    "Channel human readable title",
+                    "Tune Tide Music",
                     NotificationManager.IMPORTANCE_DEFAULT);
 
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
@@ -176,6 +181,7 @@ public class MusicService extends Service {
     public void playNextSong() {
         currentPosition = (currentPosition + 1) % songsList.size();
         playSong(currentPosition);
+        sendPlaybackStateChangedIntent(SongPlaybackActionEnum.NEXT);
         if (!mediaPlayer.isPlaying()) {
             mediaPlayer.start();
         }
@@ -187,6 +193,7 @@ public class MusicService extends Service {
     public void playPreviousSong() {
         currentPosition = (currentPosition - 1 < 0) ? songsList.size() - 1 : currentPosition - 1;
         playSong(currentPosition);
+        sendPlaybackStateChangedIntent(SongPlaybackActionEnum.PREV);
     }
 
     /**
@@ -201,13 +208,16 @@ public class MusicService extends Service {
                 if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                     mediaPlayer.start();
                     showMediaNotification(songsList.get(currentPosition).getTitle(), true);
+                    sendPlaybackStateChangedIntent(SongPlaybackActionEnum.PLAY);
                 }
         }
     }
 
-    public void pause() {
+    public void pause(Boolean isPausedByUser) {
         if (mediaPlayer.isPlaying()) {
+            setPausedByUser(isPausedByUser);
             mediaPlayer.pause();
+            sendPlaybackStateChangedIntent(SongPlaybackActionEnum.PAUSE);
             showMediaNotification(songsList.get(currentPosition).getTitle(), false);
         }
     }
@@ -216,10 +226,12 @@ public class MusicService extends Service {
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_LOSS:
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                pause();
+                pause(false);;
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
-                play();
+                if(!isPausedByUser) {
+                    play();
+                }
                 break;
         }
     };
@@ -276,6 +288,10 @@ public class MusicService extends Service {
      */
     public int getCurrentSongPosition() {
         return currentPosition;
+    }
+
+    public void setPausedByUser(boolean pausedByUser) {
+        this.isPausedByUser = pausedByUser;
     }
 
     @Override
